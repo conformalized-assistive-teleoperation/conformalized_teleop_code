@@ -15,6 +15,11 @@ chmod +x run_all_experiments.sh
 ```
 
 
+### For the latent prefs + 7dof goal reaching context, download latent prefs training data from this Drive link
+https://drive.google.com/drive/u/1/folders/1catM0fyRf7s7n357VhQWWU1vPYTiQiyd
+and place in 'data/training_data/7dof_goal_reaching_latent_prefs/'.
+
+
 
 
 
