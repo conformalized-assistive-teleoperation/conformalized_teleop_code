@@ -1,3 +1,7 @@
+
+data/training_data/7dof_goal_reaching_latent_prefs/train_dataset.pkl
+data/training_data/7dof_goal_reaching_latent_prefs/fixed_wrapped_train_dataset.pkl
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
