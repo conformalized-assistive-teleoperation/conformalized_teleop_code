@@ -25,7 +25,7 @@ if __name__ == '__main__':
     experiment_name = config['experiment_name']
     uncertainty_context = config['uncertainty_context']
     task_domain = config['task_domain']
-    training_data = f'data/training_data/{task_domain}_{uncertainty_context}/fixed_wrapped_train_dataset.pkl'
+    training_data = f'data/training_data/{task_domain}_{uncertainty_context}/train_dataset.pkl'
     with open(training_data, 'rb') as f:
         train_dataset = pickle.load(f)
 
@@ -88,7 +88,10 @@ if __name__ == '__main__':
     # load alice data
     indistr_alice_file = f'data/calibration_data/{task_domain}_{uncertainty_context}/calibration_alice_indistribution_traj_idx_to_data.pkl'
     with open(indistr_alice_file, 'rb') as f:
-        indistr_alice_data = pickle.load(f)['009']
+        if uncertainty_context == 'latent_prefs':
+            indistr_alice_data = pickle.load(f)['010']
+        else:
+            indistr_alice_data = pickle.load(f)['009']
 
     if calibration_type == 'acqr':
         beta_uncertainty_threshold = float(sys.argv[2])
@@ -97,7 +100,7 @@ if __name__ == '__main__':
                             teleop_model_filepath,
                             teleop_model_architecture,
                             config,
-                            experiment_name, 'alice')
+                            experiment_name, 'alice', to_plot=True)
 
     # Out of distribution trajectory user data is relevant if the uncertainty context is latent_prefs
     if uncertainty_context == 'latent_prefs':
@@ -105,7 +108,7 @@ if __name__ == '__main__':
         # load bob data
         indistr_bob_file = f'data/calibration_data/{task_domain}_{uncertainty_context}/calibration_bob_outdistribution_traj_idx_to_data.pkl'
         with open(indistr_bob_file, 'rb') as f:
-            indistr_bob_data = pickle.load(f)['010']
+            indistr_bob_data = pickle.load(f)['009']
         if calibration_type == 'acqr':
             beta_uncertainty_threshold = float(sys.argv[3])
             config['beta_uncertainty_threshold'] = beta_uncertainty_threshold
@@ -113,7 +116,7 @@ if __name__ == '__main__':
                                teleop_model_filepath,
                                teleop_model_architecture,
                                config,
-                               experiment_name, 'bob')
+                               experiment_name, 'bob', to_plot=True)
 
 
 

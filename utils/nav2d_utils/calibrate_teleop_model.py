@@ -5,13 +5,14 @@ import torch
 import numpy as np
 from scipy import stats
 import json
-
+from utils.nav2d_utils.plotting_calibration import plot_calibration_results
 
 def decimal_ceil(a, precision=2):
     return np.round(a + 0.5 * 10**(-precision), precision)
 
 def calibrate_teleop_model_with_acqr(calibration_traj_idx_to_data,
-                                  remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user):
+                                  remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user,
+                                     to_plot=False):
 
     state_dim, action_dim, latent_dim, hidden_dim = config['state_dim'], config['action_dim'], config['latent_dim'], config['hidden_dim']
     # load teleoperation controller model
@@ -28,6 +29,8 @@ def calibrate_teleop_model_with_acqr(calibration_traj_idx_to_data,
     mean_prediction_error_at_uncertain_states, mean_prediction_error_at_certain_states = [], []
     list_of_coverages = []
     list_of_interval_sizes = []
+    individual_trial_results = {}
+
 
     # iterate through the calibration trials
     if config['uncertainty_context'] == 'latent_prefs':
@@ -150,6 +153,12 @@ def calibrate_teleop_model_with_acqr(calibration_traj_idx_to_data,
                 else:
                     mean_prediction_error_at_certain_states.append(prediction_error)
 
+            individual_trial_results[(ep_index, traj_index)] = {}
+            individual_trial_results[(ep_index, traj_index)]['uncertainty_list'] = uncertainty_list
+            individual_trial_results[(ep_index, traj_index)]['dimension_to_bounds'] = dimension_to_bounds
+            individual_trial_results[(ep_index, traj_index)]['list_of_errors_over_time'] = list_of_errors_over_time
+            individual_trial_results[(ep_index, traj_index)]['list_of_alphas_over_time'] = list_of_alphas_over_time
+            individual_trial_results[(ep_index, traj_index)]['list_of_factor_lambda_over_time'] = list_of_factor_lambda_over_time
 
 
     print("Prediction error in uncertain states: ", np.mean(mean_prediction_error_at_uncertain_states))
@@ -159,7 +168,7 @@ def calibrate_teleop_model_with_acqr(calibration_traj_idx_to_data,
 
     print("T-test result: ",
           stats.ttest_ind(mean_prediction_error_at_uncertain_states, mean_prediction_error_at_certain_states))
-
+    # print("mean_prediction_error_at_uncertain_states: ", mean_prediction_error_at_uncertain_states)
 
     # print list_of_coverages
     print("Coverage: ", np.mean(list_of_coverages))
@@ -182,10 +191,17 @@ def calibrate_teleop_model_with_acqr(calibration_traj_idx_to_data,
     with open(f"results/{experiment_name}/acqr_calibration_results_{calib_user}.json", 'w') as f:
         json.dump(results, f)
 
+    if to_plot:
+        from utils.nav2d_utils.plotting_calibration import plot_calibration_results
+        plot_calibration_results(calibration_traj_idx_to_data,
+                                 remapping_model_filepath, remapping_model_architecture, config,
+                                 experiment_name, calib_user, list_of_coverages, list_of_interval_sizes, individual_trial_results)
+
     return
 
 def calibrate_teleop_model_with_qr(calibration_traj_idx_to_data,
-                                  remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user):
+                                  remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user,
+                                   to_plot=False):
 
     state_dim, action_dim, latent_dim, hidden_dim = config['state_dim'], config['action_dim'], config['latent_dim'], config['hidden_dim']
     # load teleoperation controller model
@@ -290,12 +306,14 @@ def calibrate_teleop_model_with_qr(calibration_traj_idx_to_data,
     with open(f"results/{experiment_name}/qr_calibration_results_{calib_user}.json", 'w') as f:
         json.dump(results, f)
 
+
     return
 
 
 
 def calibrate_teleop_model_with_ensemble(calibration_traj_idx_to_data,
-                                  list_remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user):
+                                  list_remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user,
+                                  to_plot=False):
 
     # load trained ensemble of remapping models
     list_of_remapping_models = []

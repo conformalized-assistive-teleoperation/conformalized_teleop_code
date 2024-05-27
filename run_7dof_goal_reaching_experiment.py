@@ -26,7 +26,7 @@ if __name__ == '__main__':
     experiment_name = config['experiment_name']
     uncertainty_context = config['uncertainty_context']
     task_domain = config['task_domain']
-    training_data = f'data/training_data/{task_domain}_{uncertainty_context}/fixed_wrapped_train_dataset.pkl'
+    training_data = f'data/training_data/{task_domain}_{uncertainty_context}/train_dataset.pkl'
     with open(training_data, 'rb') as f:
         train_dataset = pickle.load(f)
 
@@ -103,7 +103,7 @@ if __name__ == '__main__':
                             teleop_model_filepath,
                             teleop_model_architecture,
                             config,
-                            experiment_name, 'alice')
+                            experiment_name, 'alice', to_plot=True)
 
     # Out of distribution trajectory user data is relevant if the uncertainty context is latent_prefs
     if uncertainty_context == 'latent_prefs':
@@ -123,7 +123,7 @@ if __name__ == '__main__':
                                teleop_model_filepath,
                                teleop_model_architecture,
                                config,
-                               experiment_name, 'bob')
+                               experiment_name, 'bob', to_plot=True)
 
 
 

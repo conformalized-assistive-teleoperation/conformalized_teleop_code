@@ -11,7 +11,8 @@ def decimal_ceil(a, precision=2):
     return np.round(a + 0.5 * 10**(-precision), precision)
 
 def calibrate_teleop_model_with_acqr(calibration_traj_idx_to_data,
-                                  remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user):
+                                  remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user,
+                                     to_plot=False):
 
     state_dim, action_dim, latent_dim, hidden_dim = config['state_dim'], config['action_dim'], config['latent_dim'], config['hidden_dim']
     # load teleoperation controller model
@@ -28,6 +29,7 @@ def calibrate_teleop_model_with_acqr(calibration_traj_idx_to_data,
     mean_prediction_error_at_uncertain_states, mean_prediction_error_at_certain_states = [], []
     list_of_coverages = []
     list_of_interval_sizes = []
+    individual_trial_results = {}
 
     # iterate through the calibration trials
     for traj_index in calibration_traj_idx_to_data:
@@ -61,7 +63,20 @@ def calibrate_teleop_model_with_acqr(calibration_traj_idx_to_data,
             human_input_state, predicted_action, next_state_applying_action, rotated_z = calibration_traj_data[
                 timestep]
             state = torch.FloatTensor([human_input_state[0:7]])
-            true_high_dim_action = torch.FloatTensor([predicted_action[0:7]])
+            true_high_dim_action = np.array(predicted_action[0:7])
+            true_high_dim_action = torch.FloatTensor([true_high_dim_action])
+            # if np.any(abs(true_high_dim_action - 2 * np.pi) < 0.2):
+            #     idx_wrap = np.where(abs(true_high_dim_action - 2 * np.pi) < 0.2)
+            #
+            #     if true_high_dim_action[idx_wrap] > 0:
+            #         true_high_dim_action[idx_wrap] = -2 * np.pi + true_high_dim_action[idx_wrap]
+            #     else:
+            #         true_high_dim_action[idx_wrap] = 2 * np.pi + true_high_dim_action[idx_wrap]
+            #
+            #     assert np.all(abs(true_high_dim_action - 2 * np.pi) > 0.2)
+
+
+
             rotated_z = torch.FloatTensor([rotated_z])
             # we want dx, dy, not dz: drop last dimension (dz) of rotated_z
             low_dim_action = rotated_z[:, :-1]
@@ -144,6 +159,13 @@ def calibrate_teleop_model_with_acqr(calibration_traj_idx_to_data,
             else:
                 mean_prediction_error_at_certain_states.append(prediction_error)
 
+        individual_trial_results[traj_index] = {}
+        individual_trial_results[traj_index]["uncertainty_list"] = uncertainty_list
+        individual_trial_results[traj_index]["list_of_errors_over_time"] = list_of_errors_over_time
+        individual_trial_results[traj_index]["list_of_alphas_over_time"] = list_of_alphas_over_time
+        individual_trial_results[traj_index][
+            "list_of_factor_lambda_over_time"] = list_of_factor_lambda_over_time
+        individual_trial_results[traj_index]["dimension_to_bounds"] = dimension_to_bounds
 
 
     print("Prediction error in uncertain states: ", np.mean(mean_prediction_error_at_uncertain_states))
@@ -176,10 +198,17 @@ def calibrate_teleop_model_with_acqr(calibration_traj_idx_to_data,
     with open(f"results/{experiment_name}/acqr_calibration_results_{calib_user}.json", 'w') as f:
         json.dump(results, f)
 
+    if to_plot:
+        from utils.robot_7dof_grasp_utils.plotting_calibration import plot_calibration_results
+        plot_calibration_results(calibration_traj_idx_to_data,
+                                 remapping_model_filepath, remapping_model_architecture, config,
+                                 experiment_name, calib_user, list_of_coverages, list_of_interval_sizes,
+                                 individual_trial_results)
     return
 
 def calibrate_teleop_model_with_qr(calibration_traj_idx_to_data,
-                                  remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user):
+                                  remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user,
+                                   to_plot=False):
 
     state_dim, action_dim, latent_dim, hidden_dim = config['state_dim'], config['action_dim'], config['latent_dim'], config['hidden_dim']
     # load teleoperation controller model
@@ -218,7 +247,18 @@ def calibrate_teleop_model_with_qr(calibration_traj_idx_to_data,
             human_input_state, predicted_action, next_state_applying_action, rotated_z = calibration_traj_data[
                 timestep]
             state = torch.FloatTensor([human_input_state[0:7]])
-            true_high_dim_action = torch.FloatTensor([predicted_action[0:7]])
+            true_high_dim_action = np.array(predicted_action[0:7])
+            # if np.any(abs(true_high_dim_action - 2 * np.pi) < 0.2):
+                # idx_wrap = np.where(abs(true_high_dim_action - 2 * np.pi) < 0.2)
+                #
+                # if true_high_dim_action[idx_wrap] > 0:
+                #     true_high_dim_action[idx_wrap] = -2 * np.pi + true_high_dim_action[idx_wrap]
+                # else:
+                #     true_high_dim_action[idx_wrap] = 2 * np.pi + true_high_dim_action[idx_wrap]
+                #
+                # assert np.all(abs(true_high_dim_action - 2 * np.pi) > 0.2)
+
+            true_high_dim_action = torch.FloatTensor([true_high_dim_action])
             rotated_z = torch.FloatTensor([rotated_z])
             # we want dx, dy, not dz: drop last dimension (dz) of rotated_z
             low_dim_action = rotated_z[:, :-1]
@@ -283,7 +323,8 @@ def calibrate_teleop_model_with_qr(calibration_traj_idx_to_data,
 
 
 def calibrate_teleop_model_with_ensemble(calibration_traj_idx_to_data,
-                                  list_remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user):
+                                  list_remapping_model_filepath, remapping_model_architecture, config, experiment_name, calib_user,
+                                         to_plot=False):
 
     # load trained ensemble of remapping models
     list_of_remapping_models = []
@@ -308,14 +349,25 @@ def calibrate_teleop_model_with_ensemble(calibration_traj_idx_to_data,
         for timestep in range(0, len(calibration_traj_data)):
             human_input_state, predicted_action, _, rotated_z = calibration_traj_data[timestep]
             human_input_state = torch.FloatTensor([human_input_state[0:7]])
-            predicted_action = torch.FloatTensor([predicted_action[0:7]])
+            # predicted_action = torch.FloatTensor([predicted_action[0:7]])
             rotated_z = torch.FloatTensor([rotated_z])
             # drop last dimension 2 of rotated_z
             rotated_z = rotated_z[:, :-1]
 
             state = human_input_state
             low_dim_action = rotated_z
-            true_high_dim_action = predicted_action
+            true_high_dim_action = np.array(predicted_action[0:7])
+            # if np.any(abs(true_high_dim_action - 2 * np.pi) < 0.2):
+            #     idx_wrap = np.where(abs(true_high_dim_action - 2 * np.pi) < 0.2)
+            #
+            #     if true_high_dim_action[idx_wrap] > 0:
+            #         true_high_dim_action[idx_wrap] = -2 * np.pi + true_high_dim_action[idx_wrap]
+            #     else:
+            #         true_high_dim_action[idx_wrap] = 2 * np.pi + true_high_dim_action[idx_wrap]
+            #
+            #     assert np.all(abs(true_high_dim_action - 2 * np.pi) > 0.2)
+
+            true_high_dim_action = torch.FloatTensor([true_high_dim_action])
             list_of_prediction_mean_vars = []
             list_of_means = []
             list_of_vars = []
