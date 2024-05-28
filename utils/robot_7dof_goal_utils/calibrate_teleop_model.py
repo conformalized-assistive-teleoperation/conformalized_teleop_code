@@ -482,7 +482,8 @@ def calibrate_teleop_model_with_acqr_w_human_data(calibration_traj_idx_to_data,
 
     # resave
     # resave_file = []
-
+    # import matplotlib.pyplot as plt
+    # plt.figure()
     for timestep in range(0, len(calibration_traj_data)):
         human_input_state, predicted_action, rotated_z = calibration_traj_data[
             timestep]
@@ -500,12 +501,18 @@ def calibrate_teleop_model_with_acqr_w_human_data(calibration_traj_idx_to_data,
         #     assert np.all(abs(true_high_dim_action - 2 * np.pi) > 0.2)
 
         # swap rotated_z
-        # Lx,Ly = rotated_z
-        # Lx, Ly = -Lx, -Ly
-        # rotated_z = [Lx, Ly]
-        # resave_file.append([state, true_high_dim_action, rotated_z])
+    #     Lx,Ly = rotated_z
+    #     Lx, Ly = -Ly, Lx
+    #     rotated_z = [Lx, Ly]
+    #     resave_file.append([state, true_high_dim_action, rotated_z])
+    # #     plt.scatter(Lx, Ly, color=task_color)
+    # # plt.show()
+    # # save resave file
+    # import pickle
+    # with open(f"data/resave_{calib_user}_{task_color}.pkl", 'wb') as f:
+    #     pickle.dump(resave_file, f)
 
-
+    # if False:
         true_high_dim_action = torch.FloatTensor([true_high_dim_action])
 
         rotated_z = torch.FloatTensor([rotated_z])

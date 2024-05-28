@@ -264,14 +264,16 @@ def plot_calibration_results_w_human_data(calibration_traj_idx_to_data,
     # plot scatter plot of uncertainty at each timestep, color red if above threshold, green if below
     for t in range(len(uncertainty_list)):
         if uncertainty_list[t] > beta_uncertainty_threshold:
-            ax4.scatter(t + 1, uncertainty_list[t], c='#E07800', marker='o', s=25, alpha=0.7)
+            ax4.scatter(t + 1, uncertainty_list[t], c='#E07800', marker='o', s=30, alpha=0.7)
             # ax1.scatter(t, list_of_factor_lambda_over_time[t], c='#E07800', marker='o', s=100, alpha=0.7)
             # ax2.scatter(t, list_of_factor_lambda_over_time[t], c='#E07800', marker='o', s=100, alpha=0.7)
         else:
-            ax4.scatter(t + 1, uncertainty_list[t], c='#5E5E5E', marker='o', s=12, alpha=0.5)
+            ax4.scatter(t + 1, uncertainty_list[t], c='#5E5E5E', marker='o', s=30, alpha=0.5)
 
-    ax4.plot(np.arange(1, len(uncertainty_list) + 1), uncertainty_list, label="uncertainty", color="purple")
+    ax4.plot(np.arange(1, len(uncertainty_list) + 1), uncertainty_list, label="uncertainty", color="black")
     ax4.set_title("Uncertainty over time")
+    ax4.set_ylim(-0.01, 2.5)
+    # ax4.set_ylim(-0.01, 1.6)
 
     Xc, Yc, Zc = data_for_cylinder_along_z(0.70980445 + 0.1, 0.25232062, 0.03, 0.3)
     ax5.plot_surface(Xc, Yc, Zc, color='cyan', alpha=0.3)
