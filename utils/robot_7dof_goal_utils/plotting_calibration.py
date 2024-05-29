@@ -272,7 +272,7 @@ def plot_calibration_results_w_human_data(calibration_traj_idx_to_data,
 
     ax4.plot(np.arange(1, len(uncertainty_list) + 1), uncertainty_list, label="uncertainty", color="black")
     ax4.set_title("Uncertainty over time")
-    ax4.set_ylim(-0.01, 2.5)
+    ax4.set_ylim(-0.01, 3.2)
     # ax4.set_ylim(-0.01, 1.6)
 
     Xc, Yc, Zc = data_for_cylinder_along_z(0.70980445 + 0.1, 0.25232062, 0.03, 0.3)

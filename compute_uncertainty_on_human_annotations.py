@@ -85,9 +85,10 @@ if __name__ == '__main__':
         print("Calibration type not supported")
         exit(1)
 
+    task_color = sys.argv[4]
     for human_annot in ['hstar', 'h1', 'h2', 'h3', 'h4']:
     # for human_annot in ['h1']:
-        for task_color in ['red']:
+        for task_color in [task_color]:
             print("\n\nCalibrating on ", human_annot, " for task color: ", task_color)
             # load human data
             human_data_file = f'data/human_annotations/{human_annot}_{task_color}.pkl'

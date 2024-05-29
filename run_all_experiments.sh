@@ -19,7 +19,8 @@
 #python run_7dof_goal_reaching_experiment.py goal7dof/goal7dof_controlprec_qr
 #python run_7dof_goal_reaching_experiment.py goal7dof/goal7dof_controlprec_ensemble
 
-python compute_uncertainty_on_human_annotations.py goal7dof/goal7dof_latentprefs_acqr 0.2 0.2
+#python compute_uncertainty_on_human_annotations.py goal7dof/goal7dof_latentprefs_acqr 0.2 0.2 blue
+python compute_uncertainty_on_human_annotations.py goal7dof/goal7dof_latentprefs_acqr 0.4 0.4 red
 #python compute_uncertainty_on_human_annotations.py goal7dof/goal7dof_latentprefs_qr
 ##
 ##

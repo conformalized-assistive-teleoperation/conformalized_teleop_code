@@ -502,11 +502,11 @@ def calibrate_teleop_model_with_acqr_w_human_data(calibration_traj_idx_to_data,
 
         # swap rotated_z
     #     Lx,Ly = rotated_z
-    #     Lx, Ly = -Ly, Lx
-    #     rotated_z = [Lx, Ly]
-    #     resave_file.append([state, true_high_dim_action, rotated_z])
-    # #     plt.scatter(Lx, Ly, color=task_color)
-    # # plt.show()
+    # #     Lx, Ly = -Ly, Lx
+    # #     rotated_z = [Lx, Ly]
+    # #     resave_file.append([state, true_high_dim_action, rotated_z])
+    #     plt.scatter(Lx, Ly, color=task_color)
+    # plt.show()
     # # save resave file
     # import pickle
     # with open(f"data/resave_{calib_user}_{task_color}.pkl", 'wb') as f:
