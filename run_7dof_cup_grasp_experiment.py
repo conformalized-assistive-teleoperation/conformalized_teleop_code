@@ -100,7 +100,7 @@ if __name__ == '__main__':
                             teleop_model_filepath,
                             teleop_model_architecture,
                             config,
-                            experiment_name, 'alice', to_plot=True)
+                            experiment_name, 'alice', to_plot=False)
 
     # Out of distribution trajectory user data is relevant if the uncertainty context is latent_prefs
     if uncertainty_context == 'latent_prefs':
@@ -116,7 +116,7 @@ if __name__ == '__main__':
                                teleop_model_filepath,
                                teleop_model_architecture,
                                config,
-                               experiment_name, 'bob', to_plot=True)
+                               experiment_name, 'bob', to_plot=False)
 
 
 
